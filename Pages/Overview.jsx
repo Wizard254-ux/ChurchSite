@@ -76,9 +76,9 @@ const Overview = () => {
   };
 
   return (
-    <div className=" bg-gray-400 min-h-screen">
+    <div className=" bg-gray-200 min-h-screen md:flex md:flex-row">
         <Navbar/>
-<div className="px-5 pb-2">
+<div className="px-5 pb-2 flex-1 h-screen overflow-y-auto">
         <OverviewSection/>
       {/* Search Bar */}
       <div className="m-4 ">

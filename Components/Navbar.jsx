@@ -1,9 +1,19 @@
 import React, { useState, useEffect } from 'react';
-import { Menu, X, ChevronDown, ChevronUp, Activity, Users, DollarSign, UserPlus, RefreshCw, Plus, LogOut } from 'lucide-react';
+import { Menu, X, ChevronDown, ChevronUp, Activity, User, Users, DollarSign, UserPlus, RefreshCw, Plus, LogOut } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 
-const Navbar = () => {
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+const Sidebar = () => {
+  // Get initial sidebar state from localStorage or default based on screen size
+  const getInitialSidebarState = () => {
+    const savedState = localStorage.getItem('sidebarOpen');
+    if (savedState !== null) {
+      return JSON.parse(savedState);
+    }
+    return typeof window !== 'undefined' ? window.innerWidth >= 768 : false;
+  };
+
+  const [isSidebarOpen, setIsSidebarOpen] = useState(getInitialSidebarState);
   const [isExtraOpen, setIsExtraOpen] = useState(false);
   const [windowWidth, setWindowWidth] = useState(typeof window !== 'undefined' ? window.innerWidth : 0);
   const [showChurchItemOverlay, setShowChurchItemOverlay] = useState(false);
@@ -15,22 +25,47 @@ const Navbar = () => {
   const [memberName, setMemberName] = useState('');
   const [memberPhone, setMemberPhone] = useState('');
 
+  const location = useLocation();
+  const path = location.pathname.split("/")[1]; // Extracts 'members'
+
+
+
   const navigate = useNavigate();
 
   useEffect(() => {
     const handleResize = () => {
-      setWindowWidth(window.innerWidth);
-      if (window.innerWidth >= 1024) {
+      const newWidth = window.innerWidth;
+      setWindowWidth(newWidth);
+      
+      // Only auto-change sidebar state if user hasn't manually set it
+      if (newWidth >= 768 && windowWidth < 768) {
+        setIsSidebarOpen(true);
+        localStorage.setItem('sidebarOpen', 'true');
+      } else if (newWidth < 768 && windowWidth >= 768) {
         setIsSidebarOpen(false);
+        localStorage.setItem('sidebarOpen', 'false');
       }
     };
 
+    // Set initial state based on window width
+    if (window.innerWidth >= 768 && !isSidebarOpen) {
+      setIsSidebarOpen(true);
+      localStorage.setItem('sidebarOpen', 'true');
+    }
+
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
-  }, []);
+  }, [windowWidth]);
+
+  // Save sidebar state to localStorage whenever it changes
+  useEffect(() => {
+    localStorage.setItem('sidebarOpen', JSON.stringify(isSidebarOpen));
+  }, [isSidebarOpen]);
 
   const toggleSidebar = () => {
-    setIsSidebarOpen(!isSidebarOpen);
+    const newState = !isSidebarOpen;
+    setIsSidebarOpen(newState);
+    localStorage.setItem('sidebarOpen', JSON.stringify(newState));
   };
 
   const toggleExtra = () => {
@@ -60,19 +95,19 @@ const Navbar = () => {
   };
 
   const NavItems = () => (
-    <>
+    <div className="flex flex-col space-y-2 w-full">
       <NavLink href="/overview" icon={<Activity size={20} />} text="Overview" />
       <NavLink href="/accounts" icon={<DollarSign size={20} />} text="Accounts" />
       <NavLink href="/transactions" icon={<DollarSign size={20} />} text="Transactions" />
       <NavLink href="/members" icon={<Users size={20} />} text="Members" />
       
       {/* Extra dropdown */}
-      <div className="relative">
+      <div className="relative w-full border-t-[0.3px] border-white">
         <button
           onClick={toggleExtra}
-          className="flex items-center justify-between w-full px-4 py-2 text-gray-700 hover:bg-gray-100 lg:hover:bg-transparent lg:hover:text-blue-700 rounded-lg"
+          className="flex items-center justify-between w-full mt-2 hover:text-gray-900 px-4 py-2 text-white hover:bg-gray-300 rounded-lg"
         >
-          <div className="flex items-center">
+          <div className="flex items-center  ">
             <span className="mr-2">Quick actions</span>
             {isExtraOpen ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
           </div>
@@ -80,29 +115,41 @@ const Navbar = () => {
         
         {/* Dropdown menu */}
         {isExtraOpen && (
-          <div className="lg:absolute lg:right-0 lg:mt-2 lg:w-48 lg:bg-white lg:rounded-lg lg:shadow-lg lg:border border-gray-200 lg:z-10">
-            <div className={`flex flex-col pl-4 lg:pl-0 ${windowWidth >= 1024 ? 'py-1' : 'py-0'}`}>
-              <button className='border-b-[0.3px]  border-gray-600' onClick={() => navigate(0)}>
+          <div className="w-full mt-1">
+            <div className="flex flex-col w-full">
+              <button 
+                className="w-full hover:bg-gray-100/60 cursor-pointer rounded-2xl border-gray-300 bg-transparent"
+                onClick={() => navigate(0)}
+              >
                 <DropdownItem               
                   icon={<RefreshCw size={16} />} 
                   text="Refresh" 
                 />
               </button>
-              <button className='border-b-[0.3px] border-gray-600' onClick={() => setShowChurchItemOverlay(true)}>
+              <button 
+                className="w-full hover:bg-gray-100/60 cursor-pointer rounded-2xl border-gray-300 bg-transparent" 
+                onClick={() => setShowChurchItemOverlay(true)}
+              >
                 <DropdownItem 
                   icon={<Plus size={16} />} 
                   text="Create New Church Item" 
                 />
               </button>
-              <button className='border-b-[1px] border-gray-600' onClick={() => setShowMemberOverlay(true)}>
+              <button 
+                className="w-full hover:bg-gray-100/60 cursor-pointer rounded-2xl border-gray-300 bg-transparent" 
+                onClick={() => setShowMemberOverlay(true)}
+              >
                 <DropdownItem 
                   icon={<UserPlus size={16} />} 
                   text="Register Member" 
                 />
               </button>
-              <button className='border-b-[1px] border-gray-600' onClick={() => navigate('/')}>
+              <button 
+                className="w-full hover:bg-gray-100/60 cursor-pointer rounded-2xl border-gray-300 bg-transparent" 
+                onClick={() => navigate('/')}
+              >
                 <DropdownItem 
-                  icon={<LogOut size={16} color='red'/>} 
+                  icon={<LogOut size={16} color="red" />} 
                   text="Logout" 
                 />
               </button>
@@ -110,27 +157,24 @@ const Navbar = () => {
           </div>
         )}
       </div>
-    </>
+    </div>
   );
 
   const NavLink = ({ href, icon, text }) => (
-    <a
-      href={href}
-      className="flex items-center px-4 py-2 text-gray-700 bg-white hover:bg-gray-100 lg:hover:bg-transparent lg:hover:text-blue-700 rounded-lg"
+    <span
+      onClick={() => navigate(href)}
+      className={`flex items-center px-4 py-2 cursor-pointer hover:bg-gray-100/60   text-gray-100 ${path==href.split('/')[1] && 'border-b-[0.3px] border-white'} rounded-lg w-full`}
     >
-      <span className="mr-2">{icon}</span>
+      <span className="mr-3">{icon}</span>
       <span>{text}</span>
-    </a>
+    </span>
   );
 
-  const DropdownItem = ({ href, icon, text }) => (
-    <a
-      href={href}
-      className="flex items-center px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg"
-    >
-      <span className="mr-2">{icon}</span>
+  const DropdownItem = ({ icon, text }) => (
+    <div className="flex items-center px-4 py-2 text-gray-100 rounded-lg w-full">
+      <span className="mr-3">{icon}</span>
       <span>{text}</span>
-    </a>
+    </div>
   );
 
   // Create Church Item Overlay
@@ -239,53 +283,55 @@ const Navbar = () => {
     </div>
   );
 
+  // Toggle button for mobile
+  const SidebarToggle = () => (
+    <div className='flex w-full p-1 md:hidden flex-row justify-between bg-blue-600 sticky top-0 z-30'>
+      <div className="flex gap-3 items-center p-4 border-gray-300">
+        <User color='white'/>
+        <h2 className="font-bold text-lg text-gray-100">Church Admin</h2>
+      </div>
+      <button
+        className="text-white p-2 rounded-lg shadow-lg md:hidden"
+        onClick={toggleSidebar}
+      >
+        {isSidebarOpen ? <X size={24} /> : <Menu size={24} />}
+      </button>
+    </div>
+  );
+
   return (
-    <div className='sticky top-0 z-50 '>
-      {/* Main navbar for large screens */}
-      <nav className="bg-gray-200 border-b border-gray-200 px-4 py-3 flex justify-between items-center">
-        <div className="flex items-center">
-          <h1 className="text-xl font-bold text-blue-800">Church Admin</h1>
-        </div>
-
-        {/* Menu items for large screens */}
-        <div className="hidden lg:flex items-center space-x-2">
-          <NavItems />
-        </div>
-
-        {/* Hamburger menu for small screens */}
-        <button
-          className="lg:hidden text-gray-500 hover:text-gray-700 focus:outline-none"
-          onClick={toggleSidebar}
-        >
-          <Menu size={24} />
-        </button>
-      </nav>
-
+    <>
+      {/* Mobile toggle button */}
+      <SidebarToggle />
+      
       {/* Sidebar overlay for small screens */}
-      {isSidebarOpen && (
+      {isSidebarOpen && windowWidth < 768 && (
         <div 
           style={{backgroundColor:'rgba(0,0,0,0.8)'}}
-          className="fixed inset-0 z-50 lg:hidden"
+          className="fixed inset-0 z-40 md:hidden"
           onClick={toggleSidebar}
         ></div>
       )}
 
-      {/* Sidebar for small screens */}
+      {/* Sidebar */}
       <div 
-        className={`fixed top-0 right-0 h-full w-64 bg-gray-200 shadow-lg transform transition-transform duration-300 ease-in-out z-50 ${
-          isSidebarOpen ? 'translate-x-0' : 'translate-x-full'
-        } lg:hidden`}
+        className={`fixed z-40 md:z-0 md:relative top-0 left-0 bottom-0  bg-blue-700 shadow-lg transform transition-transform duration-300 ease-in-out  
+          ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'} 
+          ${windowWidth >= 768 ? 'w-64' : 'w-64'}`}
       >
-        <div className="flex justify-between items-center p-4 border-b border-gray-200">
-          <h2 className="font-bold text-lg text-blue-800">Menu</h2>
-          <button 
-            className="text-gray-500 hover:text-gray-700"
-            onClick={toggleSidebar}
-          >
-            <X size={24} />
-          </button>
+        <div className="flex gap-3 items-center p-4 border-gray-300">
+          <User color='white'/>
+          <h2 className="font-bold text-lg text-gray-100">Church Admin</h2>
+          {windowWidth < 768 && (
+            <button 
+              className="text-gray-100 hover:text-gray-700 ml-auto"
+              onClick={toggleSidebar}
+            >
+              <X size={24} />
+            </button>
+          )}
         </div>
-        <div className="py-4 flex flex-col gap-2">
+        <div className="py-4 px-2">
           <NavItems />
         </div>
       </div>
@@ -293,8 +339,8 @@ const Navbar = () => {
       {/* Overlays */}
       {showChurchItemOverlay && <ChurchItemOverlay />}
       {showMemberOverlay && <MemberOverlay />}
-    </div>
+    </>
   );
 };
 
-export default Navbar;
+export default Sidebar;

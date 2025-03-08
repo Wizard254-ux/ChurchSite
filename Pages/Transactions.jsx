@@ -216,10 +216,9 @@ const TransactionPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-400">
-              <Navbar/>
-
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
+    <div className=" bg-gray-200 min-h-screen md:flex md:flex-row">
+        <Navbar/>
+      <div className="mx-auto max-w-7xl flex-1 px-2  pt-2 pb-2 h-screen overflow-y-auto">
         {/* Header */}
         <div className="mb-8">
           <h1 className="text-2xl font-bold text-gray-900">Finance Management</h1>

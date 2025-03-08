@@ -73,9 +73,9 @@ const AccountsPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-400 ">
-      <Navbar/>
-      <div className='px-2 pb-2'>
+    <div className=" bg-gray-200 min-h-screen md:flex md:flex-row">
+        <Navbar/>
+      <div className='px-2 pb-2 flex-1 h-screen overflow-y-auto'>
       <div className="max-w-6xl mx-auto">
         {/* Header */}
         <div className="mb-4 mt-2">

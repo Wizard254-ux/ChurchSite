@@ -33,9 +33,9 @@ const MembersPage = () => {
   });
 
   return (
-    <div className="min-h-screen bg-gray-400 ">
-      <Navbar/>
-      <div className="max-w-6xl mx-auto pb-2 px-2">
+    <div className=" bg-gray-200 min-h-screen md:flex md:flex-row">
+        <Navbar/>
+      <div className="max-w-6xl flex-1 mx-auto pb-2 px-2 h-screen overflow-y-auto">
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-center justify-between mb-4 mt-2">
           <div className="mb-4 md:mb-0">
