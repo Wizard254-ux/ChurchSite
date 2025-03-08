@@ -135,7 +135,7 @@ const Navbar = () => {
 
   // Create Church Item Overlay
   const ChurchItemOverlay = () => (
-    <div style={{backgroundColor:'rgba(0,0,0,0.7)'}} className="fixed inset-0flex items-center justify-center z-50">
+    <div style={{backgroundColor:'rgba(0,0,0,0.7)'}} className="fixed inset-0 flex items-center justify-center z-50">
       <div className="bg-white rounded-lg p-6 w-full max-w-md">
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-xl font-bold text-blue-800">Create New Church Item</h2>
